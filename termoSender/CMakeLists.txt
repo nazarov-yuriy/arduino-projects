@@ -8,12 +8,18 @@ generate_arduino_library(RF24
         SRCS /usr/share/arduino-1.6.9/libraries/RF24/RF24.cpp
         HDRS /usr/share/arduino-1.6.9/libraries/RF24/RF24.h
         )
+generate_arduino_library(HP03
+        BOARD uno
+        SRCS /usr/share/arduino-1.6.9/libraries/HP03/src/HP03.cpp
+        HDRS /usr/share/arduino-1.6.9/libraries/HP03/src/HP03.h
+        )
 set(${CMAKE_PROJECT_NAME}_BOARD uno)
-set(${CMAKE_PROJECT_NAME}_PORT /dev/ttyACM0)
-set(${CMAKE_PROJECT_NAME}_LIBS RF24)
+set(${CMAKE_PROJECT_NAME}_PORT /dev/ttyACM2)
+set(${CMAKE_PROJECT_NAME}_LIBS RF24 HP03)
 set(${CMAKE_PROJECT_NAME}_SKETCH termoSender.ino)
 include_directories(
         /usr/share/arduino-1.6.9/libraries/RF24
         /usr/share/arduino-1.6.9/libraries/nFR24L01
+        /usr/share/arduino-1.6.9/libraries/HP03/src
 )
 generate_arduino_firmware(${CMAKE_PROJECT_NAME})

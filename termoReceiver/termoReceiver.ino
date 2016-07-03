@@ -1,34 +1,35 @@
 #include <Arduino.h>
-#include "nRF24L01.h"
 #include "RF24.h"
 
-int msg[2];
+struct response {
+    long temp;     //*100
+    long pressure; //*100
+    long altitude; //*100
+    long signalStrength;
+} sensorReadings;
 RF24 radio(9, 10);
 const uint64_t pipe = 0xE8E8F0F0E1LL;
+
 
 void setup(void) {
     Serial.begin(9600);
     radio.begin();
-    radio.openReadingPipe(1, pipe);
-    radio.startListening();
+    radio.enableAckPayload();
+    radio.openWritingPipe(pipe);
 }
 
 void loop(void) {
-    if (radio.available()) {
-        bool done = false;
-        while (!done) {
-            done = radio.read(msg, 4);
-            int Fract = msg[0] % 100;
-            Serial.print(msg[0] / 100);
-
-            Serial.print(".");
-            if (Fract < 10) Serial.print("0");
-            Serial.print(Fract);
-            delay(10);
-        }
+    radio.write(&sensorReadings, sizeof(sensorReadings));
+    if (radio.isAckPayloadAvailable()) {
+        radio.read(&sensorReadings, sizeof(sensorReadings));
+        Serial.print("Temp: ");
+        Serial.print(sensorReadings.temp / 100.0);
+        Serial.print(". Pressure: ");
+        Serial.print(sensorReadings.pressure / 100.0);
+        Serial.print(". Altitude: ");
+        Serial.println(sensorReadings.altitude / 100.0);
+    } else {
+        Serial.println("No ack");
     }
-    else {
-        delay(100);
-        Serial.println("No radio available");
-    }
+    delay(1000);
 }

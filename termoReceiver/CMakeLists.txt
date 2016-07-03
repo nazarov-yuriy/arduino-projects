@@ -4,12 +4,12 @@ set(PROJECT_NAME termoReceiver)
 project(${PROJECT_NAME})
 set(CMAKE_CXX_FLAGS "-std=c++11")
 generate_arduino_library(RF24
-        BOARD uno
+        BOARD leonardo
         SRCS /usr/share/arduino-1.6.9/libraries/RF24/RF24.cpp
         HDRS /usr/share/arduino-1.6.9/libraries/RF24/RF24.h
         )
-set(${CMAKE_PROJECT_NAME}_BOARD uno)
-set(${CMAKE_PROJECT_NAME}_PORT /dev/ttyACM0)
+set(${CMAKE_PROJECT_NAME}_BOARD leonardo)
+set(${CMAKE_PROJECT_NAME}_PORT /dev/ttyACM1)
 set(${CMAKE_PROJECT_NAME}_LIBS RF24)
 set(${CMAKE_PROJECT_NAME}_SKETCH termoReceiver.ino)
 include_directories(

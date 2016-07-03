@@ -1,40 +1,54 @@
 #include <Arduino.h>
-#include <Arduino.h>
-#include "nRF24L01.h"
 #include "RF24.h"
+#include "HP03.h"
 
-int msg[2];
+struct response {
+    long temp;     //*100
+    long pressure; //*100
+    long altitude; //*100
+    long signalStrength;
+} sensorReadings;
+
 RF24 radio(9, 10);
 const uint64_t pipe = 0xE8E8F0F0E1LL;
+
+void showReadings() {
+    Serial.print("Temp ");
+    Serial.print(HP03.Temperature / 10.0);
+    sensorReadings.temp = HP03.Temperature * 10;
+    Serial.print(" Pressure ");
+    Serial.print(HP03.Pressure / 100.0);
+    sensorReadings.pressure = HP03.Pressure;
+    HP03.distanceUnits = METERS;
+    Serial.print("   Altitude: Meters = ");
+    Serial.println(HP03.getAltitude(HP03.Pressure) / 10);
+    sensorReadings.altitude = HP03.getAltitude(HP03.Pressure) * 10;
+}
 
 void setup(void) {
     Serial.begin(9600);
     radio.begin();
+    radio.enableAckPayload();
     radio.openReadingPipe(1, pipe);
     radio.startListening();
+    if (HP03.begin() == false)
+        Serial.println("Error getting HP03 calibration, check sensor connection");
 }
 
 void loop(void) {
+    if (HP03.update() == false)
+        Serial.println("Error getting HP03 data, check sensor connection");
+    else {
+        showReadings();
+    }
     if (radio.available()) {
         bool done = false;
         while (!done) {
-            done = radio.read(msg, 4);
-            int Fract = msg[0] % 100;
-            Serial.print(msg[0] / 100);
-
-            Serial.print(".");
-            if (Fract < 10) Serial.print("0");
-            Serial.print(Fract);
-            Serial.print(" ");
-            Serial.println(msg[0]);
-            if (msg[0] == 111) {
-                delay(10);
-            }
-            delay(10);
+            byte tmp;
+            done = radio.read(&tmp, sizeof(tmp));
+            Serial.print(tmp);
         }
+        radio.writeAckPayload(1, &sensorReadings, sizeof(sensorReadings));
     }
-    else {
-        delay(100);
-        Serial.println("No radio available");
-    }
+    delay(1000 - 85);
 }
