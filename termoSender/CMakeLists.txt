@@ -13,9 +13,19 @@ generate_arduino_library(HP03
         SRCS /usr/share/arduino-1.6.9/libraries/HP03/src/HP03.cpp
         HDRS /usr/share/arduino-1.6.9/libraries/HP03/src/HP03.h
         )
+generate_arduino_library(SD
+        BOARD uno
+        SRCS /usr/share/arduino-1.6.9/libraries/SD/src/SD.cpp /usr/share/arduino-1.6.9/libraries/SD/src/File.cpp
+        HDRS /usr/share/arduino-1.6.9/libraries/SD/src/SD.h
+        )
+generate_arduino_library(SPI
+        BOARD uno
+        SRCS /usr/share/arduino-1.6.9/hardware/arduino/avr/libraries/SPI/src/SPI.cpp
+        HDRS /usr/share/arduino-1.6.9/hardware/arduino/avr/libraries/SPI/src/SPI.h
+        )
 set(${CMAKE_PROJECT_NAME}_BOARD uno)
-set(${CMAKE_PROJECT_NAME}_PORT /dev/ttyACM2)
-set(${CMAKE_PROJECT_NAME}_LIBS RF24 HP03)
+set(${CMAKE_PROJECT_NAME}_PORT /dev/ttyACM0)
+set(${CMAKE_PROJECT_NAME}_LIBS RF24 HP03 SPI SD)
 set(${CMAKE_PROJECT_NAME}_SKETCH termoSender.ino)
 include_directories(
         /usr/share/arduino-1.6.9/libraries/RF24
